@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Streamlay — The Future of Streaming</title>
+<meta name="description" content="Streamlay is a next-generation Android streaming app with a premium, cinematic viewing experience.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --black:#09090B;
+  --navy:#111827;
+  --navy-soft:#151d2e;
+  --blue:#2563EB;
+  --purple:#7C3AED;
+  --cyan:#06B6D4;
+  --gold:#F59E0B;
+  --white:#FFFFFF;
+  --w-90:rgba(255,255,255,.9);
+  --w-70:rgba(255,255,255,.68);
+  --w-50:rgba(255,255,255,.46);
+  --w-30:rgba(255,255,255,.14);
+  --glass:rgba(255,255,255,.045);
+  --glass-strong:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.09);
+  --border-soft:rgba(255,255,255,.06);
+  --aurora-grad: linear-gradient(135deg, var(--blue), var(--purple) 55%, var(--cyan));
+  --gold-grad: linear-gradient(135deg, #FBBF24, var(--gold));
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+  --ease: cubic-bezier(.22,1,.36,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.font-display{
+  font-family:'Space Grotesk',sans-serif;
+  letter-spacing:-0.02em;
+}
+a{color:inherit;text-decoration:none;}
+ul{list-style:none;}
+img,svg{display:block;max-width:100%;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+
+.wrap{
+  max-width:1240px;
+  margin:0 auto;
+  padding:0 32px;
+}
+.section{
+  position:relative;
+  padding:140px 0;
+}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:.78rem;
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:18px;
+}
+.eyebrow::before{
+  content:'';
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--gold-grad);
+  box-shadow:0 0 12px var(--gold);
+}
+.section-title{
+  font-size:clamp(2.1rem,4.4vw,3.2rem);
+  font-weight:700;
+  line-height:1.08;
+  margin-bottom:20px;
+}
+.section-lead{
+  color:var(--w-70);
+  font-size:1.05rem;
+  line-height:1.7;
+  max-width:640px;
+}
+.grad-text{
+  background:var(--aurora-grad);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* reveal on scroll */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .9s var(--ease), transform .9s var(--ease);
+}
+.reveal.in-view{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none;}
+  *{animation-duration:.001s !important; animation-iteration-count:1 !important;}
+}
+
+/* ============ BACKDROP AURORA (global ambient) ============ */
+.ambient{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.ambient span{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:.35;
+  will-change:transform;
+}
+.ambient .b1{width:640px;height:640px;background:var(--blue);top:-220px;left:-160px;animation:driftA 26s ease-in-out infinite;}
+.ambient .b2{width:560px;height:560px;background:var(--purple);top:30%;right:-200px;animation:driftB 30s ease-in-out infinite;}
+.ambient .b3{width:520px;height:520px;background:var(--cyan);bottom:-260px;left:20%;animation:driftC 34s ease-in-out infinite;}
+@keyframes driftA{0%,100%{transform:translate(0,0);}50%{transform:translate(80px,60px);}}
+@keyframes driftB{0%,100%{transform:translate(0,0);}50%{transform:translate(-70px,80px);}}
+@keyframes driftC{0%,100%{transform:translate(0,0);}50%{transform:translate(60px,-70px);}}
+
+/* ============ HEADER ============ */
+.header{
+  position:fixed;
+  top:0;left:0;right:0;
+  z-index:100;
+  padding:22px 0;
+  transition:padding .4s var(--ease), background .4s var(--ease);
+}
+.header.scrolled{
+  padding:12px 0;
+  background:rgba(9,9,11,.65);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  border-bottom:1px solid var(--border-soft);
+}
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  font-size:1.25rem;
+}
+.logo-mark{
+  width:32px;height:32px;
+  border-radius:10px;
+  background:var(--aurora-grad);
+  position:relative;
+  box-shadow:0 0 22px rgba(124,58,237,.55);
+}
+.logo-mark::after{
+  content:'';
+  position:absolute;
+  inset:9px;
+  border-radius:5px;
+  background:var(--black);
+  clip-path:polygon(30% 20%, 30% 80%, 80% 50%);
+}
+.nav{
+  display:flex;
+  align-items:center;
+  gap:38px;
+}
+.nav a{
+  font-size:.92rem;
+  font-weight:500;
+  color:var(--w-70);
+  position:relative;
+  transition:color .25s;
+}
+.nav a:hover{color:var(--white);}
+.nav a::after{
+  content:'';
+  position:absolute;
+  left:0;bottom:-8px;
+  width:0;height:2px;
+  background:var(--gold-grad);
+  transition:width .3s var(--ease);
+}
+.nav a:hover::after{width:100%;}
+.header-cta{display:flex;align-items:center;gap:14px;}
+.burger{
+  display:none;
+  width:40px;height:40px;
+  border-radius:50%;
+  background:var(--glass);
+  border:1px solid var(--border);
+  align-items:center;justify-content:center;
+  flex-direction:column;
+  gap:5px;
+}
+.burger span{width:16px;height:1.5px;background:var(--white);border-radius:2px;transition:.3s;}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:14px 28px;
+  border-radius:100px;
+  font-size:.92rem;
+  font-weight:600;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), background .35s;
+  white-space:nowrap;
+}
+.btn-primary{
+  background:var(--aurora-grad);
+  color:var(--white);
+  box-shadow:0 8px 30px -6px rgba(37,99,235,.55), 0 0 0 1px rgba(255,255,255,.06) inset;
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 14px 38px -6px rgba(124,58,237,.7), 0 0 0 1px rgba(255,255,255,.1) inset;}
+.btn-ghost{
+  background:var(--glass);
+  border:1px solid var(--border);
+  color:var(--white);
+  backdrop-filter:blur(10px);
+}
+.btn-ghost:hover{background:var(--glass-strong);transform:translateY(-3px);border-color:rgba(255,255,255,.2);}
+.btn-sm{padding:10px 20px;font-size:.82rem;}
+.btn-icon{width:18px;height:18px;}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  padding:160px 0 100px;
+  z-index:1;
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:60px;
+  align-items:center;
+}
+.hero-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 16px 8px 8px;
+  border-radius:100px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  font-size:.8rem;
+  color:var(--w-70);
+  margin-bottom:28px;
+}
+.hero-badge .dot{
+  width:22px;height:22px;
+  border-radius:50%;
+  background:var(--gold-grad);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;
+  color:var(--black);
+  font-weight:700;
+}
+.hero h1{
+  font-size:clamp(2.8rem,6.4vw,5.4rem);
+  font-weight:700;
+  line-height:1.02;
+  margin-bottom:26px;
+}
+.hero p.lead{
+  font-size:1.15rem;
+  color:var(--w-70);
+  line-height:1.7;
+  max-width:520px;
+  margin-bottom:40px;
+}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:52px;}
+.hero-stats{display:flex;gap:36px;flex-wrap:wrap;}
+.hero-stat b{
+  display:block;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:1.6rem;
+  font-weight:700;
+}
+.hero-stat span{font-size:.8rem;color:var(--w-50);}
+
+/* Orbit / phone visual */
+.hero-visual{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:640px;
+}
+.orbit-field{
+  position:absolute;
+  width:560px;height:560px;
+  animation:spin 40s linear infinite;
+}
+.orbit-field.o2{width:460px;height:460px;top:50px;left:50px;animation:spinRev 30s linear infinite;}
+@keyframes spin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+@keyframes spinRev{from{transform:rotate(360deg);}to{transform:rotate(0);}}
+.ring{
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:1px solid var(--border);
+}
+.node{
+  position:absolute;
+  width:10px;height:10px;
+  border-radius:50%;
+  top:-5px;left:50%;
+  background:var(--cyan);
+  box-shadow:0 0 16px var(--cyan), 0 0 30px var(--cyan);
+}
+.orbit-field.o2 .node{background:var(--gold);box-shadow:0 0 16px var(--gold), 0 0 30px var(--gold);top:auto;bottom:-5px;left:20%;}
+.orbit-field .node.n2{top:50%;left:auto;right:-5px;background:var(--purple);box-shadow:0 0 16px var(--purple);}
+
+.phone{
+  position:relative;
+  width:280px;
+  height:568px;
+  border-radius:40px;
+  background:linear-gradient(160deg,#181c27,#0c0e14);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 40px 90px -30px rgba(37,99,235,.45), 0 0 0 1px rgba(255,255,255,.04) inset;
+  padding:12px;
+  animation:floaty 6s ease-in-out infinite;
+  z-index:2;
+}
+@keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-16px);}}
+.phone-screen{
+  width:100%;height:100%;
+  border-radius:30px;
+  background:radial-gradient(120% 60% at 50% 0%, rgba(37,99,235,.35), transparent 60%), var(--navy);
+  overflow:hidden;
+  position:relative;
+  padding:20px 16px;
+}
+.phone-notch{
+  position:absolute;
+  top:8px;left:50%;
+  transform:translateX(-50%);
+  width:70px;height:6px;
+  border-radius:6px;
+  background:rgba(0,0,0,.5);
+}
+.phone-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:14px 0 18px;
+}
+.phone-top .lm{width:16px;height:16px;border-radius:5px;background:var(--aurora-grad);}
+.phone-top span{font-size:.72rem;font-weight:700;color:var(--w-90);}
+.phone-hero-card{
+  height:120px;
+  border-radius:16px;
+  background:linear-gradient(135deg, rgba(37,99,235,.55), rgba(124,58,237,.55));
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
+}
+.phone-hero-card::after{
+  content:'';
+  position:absolute;
+  bottom:10px;left:10px;
+  width:34px;height:34px;
+  border-radius:50%;
+  background:rgba(255,255,255,.9);
+  box-shadow:0 0 20px rgba(255,255,255,.4);
+}
+.phone-row-label{font-size:.66rem;color:var(--w-50);margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;}
+.phone-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:16px;
+}
+.phone-grid div{
+  aspect-ratio:2/3;
+  border-radius:9px;
+}
+.phone-grid div:nth-child(1){background:linear-gradient(160deg,var(--cyan),var(--blue));}
+.phone-grid div:nth-child(2){background:linear-gradient(160deg,var(--purple),#4c1d95);}
+.phone-grid div:nth-child(3){background:linear-gradient(160deg,var(--gold),#b45309);}
+.phone-grid div:nth-child(4){background:linear-gradient(160deg,#334155,#1e293b);}
+.phone-grid div:nth-child(5){background:linear-gradient(160deg,var(--blue),#1e3a8a);}
+.phone-grid div:nth-child(6){background:linear-gradient(160deg,#0e7490,var(--cyan));}
+.phone-navbar{
+  position:absolute;
+  bottom:14px;left:16px;right:16px;
+  height:46px;
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+}
+.phone-navbar i{width:16px;height:16px;border-radius:5px;background:var(--w-30);}
+.phone-navbar i:first-child{background:var(--aurora-grad);}
+
+.glow-card{
+  position:absolute;
+  padding:14px 18px;
+  border-radius:16px;
+  background:rgba(17,24,39,.75);
+  border:1px solid var(--border);
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 40px -20px rgba(0,0,0,.6);
+  animation:floaty 7s ease-in-out infinite;
+  z-index:3;
+}
+.glow-card.gc1{top:60px;left:-40px;animation-delay:-2s;}
+.glow-card.gc2{bottom:70px;right:-30px;animation-delay:-4s;}
+.glow-card .gc-title{font-size:.78rem;font-weight:700;}
+.glow-card .gc-sub{font-size:.68rem;color:var(--w-50);}
+.gc-row{display:flex;align-items:center;gap:10px;}
+.gc-icon{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.gc1 .gc-icon{background:linear-gradient(135deg,var(--cyan),var(--blue));}
+.gc2 .gc-icon{background:var(--gold-grad);}
+.gc-icon svg{width:16px;height:16px;stroke:var(--white);}
+
+/* ============ ABOUT ============ */
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:70px;
+  align-items:center;
+}
+.about-list{
+  margin-top:36px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.about-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:16px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border-soft);
+  background:var(--glass);
+  transition:background .3s, border-color .3s, transform .3s;
+}
+.about-item:hover{background:var(--glass-strong);border-color:var(--border);transform:translateY(-3px);}
+.about-item .dot{
+  flex-shrink:0;
+  width:8px;height:8px;
+  border-radius:50%;
+  margin-top:6px;
+  background:var(--gold-grad);
+  box-shadow:0 0 10px var(--gold);
+}
+.about-item b{display:block;font-size:.9rem;font-weight:600;}
+.about-visual{
+  position:relative;
+  border-radius:var(--radius-lg);
+  padding:2px;
+  background:linear-gradient(135deg, rgba(37,99,235,.5), rgba(124,58,237,.3), rgba(6,182,212,.4));
+}
+.about-visual-inner{
+  border-radius:calc(var(--radius-lg) - 2px);
+  background:linear-gradient(160deg, var(--navy-soft), #0b0e17);
+  padding:40px;
+  min-height:420px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:22px;
+}
+.mini-stat{display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--border-soft);}
+.mini-stat:last-child{border-bottom:none;padding-bottom:0;}
+.mini-stat b{font-family:'Space Grotesk';font-size:1.7rem;}
+.mini-stat span{font-size:.8rem;color:var(--w-50);max-width:150px;text-align:right;line-height:1.4;}
+
+/* ============ FEATURES ============ */
+.features-header{text-align:center;max-width:640px;margin:0 auto 64px;}
+.features-header .section-lead{margin:0 auto;}
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+.feature-card{
+  position:relative;
+  padding:28px 24px;
+  border-radius:var(--radius-md);
+  background:var(--glass);
+  border:1px solid var(--border-soft);
+  overflow:hidden;
+  transition:transform .4s var(--ease), border-color .4s, background .4s;
+}
+.feature-card::before{
+  content:'';
+  position:absolute;
+  top:-60%;left:-60%;
+  width:220%;height:220%;
+  background:radial-gradient(circle at 30% 30%, rgba(37,99,235,.18), transparent 55%);
+  opacity:0;
+  transition:opacity .5s;
+}
+.feature-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,255,255,.18);
+  background:var(--glass-strong);
+}
+.feature-card:hover::before{opacity:1;}
+.feature-icon{
+  width:46px;height:46px;
+  border-radius:13px;
+  background:linear-gradient(135deg, rgba(37,99,235,.25), rgba(124,58,237,.25));
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;
+  position:relative;
+  z-index:1;
+  transition:transform .4s var(--ease);
+}
+.feature-card:hover .feature-icon{transform:scale(1.08) rotate(-4deg);}
+.feature-icon svg{width:22px;height:22px;stroke:var(--white);fill:none;stroke-width:1.6;}
+.feature-card h3{font-size:1rem;font-weight:600;margin-bottom:8px;position:relative;z-index:1;}
+.feature-card p{font-size:.85rem;color:var(--w-50);line-height:1.6;position:relative;z-index:1;}
+
+/* ============ DOWNLOAD ============ */
+.download-card{
+  position:relative;
+  border-radius:var(--radius-lg);
+  padding:3px;
+  background:linear-gradient(120deg, var(--blue), var(--purple), var(--cyan), var(--gold));
+  background-size:300% 300%;
+  animation:gradientShift 10s ease infinite;
+}
+@keyframes gradientShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.download-card-inner{
+  border-radius:calc(var(--radius-lg) - 3px);
+  background:linear-gradient(160deg,#0d1120,#090a10);
+  padding:64px;
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:50px;
+  align-items:center;
+}
+.download-meta{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  margin:32px 0 36px;
+}
+.meta-item{
+  padding:16px 18px;
+  border-radius:14px;
+  background:var(--glass);
+  border:1px solid var(--border-soft);
+}
+.meta-item span{display:block;font-size:.7rem;color:var(--w-50);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.meta-item b{font-family:'Space Grotesk';font-size:1.15rem;}
+.download-actions{display:flex;gap:16px;flex-wrap:wrap;}
+.download-visual{
+  position:relative;
+  height:100%;
+  min-height:280px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.dv-ring{
+  width:220px;height:220px;
+  border-radius:50%;
+  border:1px dashed var(--border);
+  display:flex;align-items:center;justify-content:center;
+  animation:spin 24s linear infinite;
+}
+.dv-core{
+  width:130px;height:130px;
+  border-radius:50%;
+  background:var(--aurora-grad);
+  box-shadow:0 0 60px rgba(124,58,237,.5);
+  display:flex;align-items:center;justify-content:center;
+}
+.dv-core svg{width:46px;height:46px;stroke:var(--white);fill:none;stroke-width:1.6;}
+
+/* ============ PLATFORMS ============ */
+.platform-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+.platform-card{
+  border-radius:var(--radius-md);
+  background:var(--glass);
+  border:1px solid var(--border-soft);
+  padding:36px 30px;
+  transition:transform .4s var(--ease), border-color .4s;
+}
+.platform-card:hover{transform:translateY(-8px);border-color:rgba(255,255,255,.18);}
+.platform-illustration{
+  height:150px;
+  border-radius:16px;
+  margin-bottom:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(160deg, rgba(37,99,235,.18), rgba(124,58,237,.12));
+  border:1px solid var(--border-soft);
+}
+.platform-illustration svg{width:56px;height:56px;stroke:var(--white);fill:none;stroke-width:1.4;position:relative;z-index:1;}
+.platform-illustration::after{
+  content:'';
+  position:absolute;
+  width:140px;height:140px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(6,182,212,.35), transparent 70%);
+  filter:blur(10px);
+}
+.platform-card h3{font-size:1.15rem;font-weight:600;margin-bottom:10px;}
+.platform-card p{font-size:.88rem;color:var(--w-50);line-height:1.6;}
+
+/* ============ FOOTER ============ */
+.footer{
+  border-top:1px solid var(--border-soft);
+  padding:80px 0 32px;
+  position:relative;
+  z-index:1;
+}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1fr 1fr;
+  gap:40px;
+  padding-bottom:50px;
+}
+.footer-brand p{color:var(--w-50);font-size:.88rem;line-height:1.7;margin-top:16px;max-width:280px;}
+.footer-col h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:var(--w-50);margin-bottom:18px;}
+.footer-col ul{display:flex;flex-direction:column;gap:12px;}
+.footer-col a{font-size:.9rem;color:var(--w-70);transition:color .25s;}
+.footer-col a:hover{color:var(--white);}
+.footer-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding-top:28px;
+  border-top:1px solid var(--border-soft);
+  color:var(--w-50);
+  font-size:.82rem;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1024px){
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-visual{height:480px;margin-top:20px;}
+  .about-grid{grid-template-columns:1fr;}
+  .features-grid{grid-template-columns:repeat(2,1fr);}
+  .download-card-inner{grid-template-columns:1fr;padding:44px;}
+  .platform-grid{grid-template-columns:repeat(3,1fr);gap:16px;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:860px){
+  .nav{display:none;}
+  .burger{display:flex;}
+  .header-cta .btn-ghost{display:none;}
+  .section{padding:100px 0;}
+}
+@media (max-width:640px){
+  .wrap{padding:0 20px;}
+  .hero{padding:140px 0 70px;}
+  .hero-stats{gap:24px;}
+  .about-list{grid-template-columns:1fr;}
+  .features-grid{grid-template-columns:1fr 1fr;gap:14px;}
+  .feature-card{padding:20px 16px;}
+  .platform-grid{grid-template-columns:1fr;}
+  .download-meta{grid-template-columns:1fr 1fr;}
+  .download-card-inner{padding:30px;}
+  .footer-grid{grid-template-columns:1fr;gap:30px;}
+  .footer-bottom{flex-direction:column;align-items:flex-start;}
+  .phone{width:230px;height:470px;}
+  .glow-card{display:none;}
+}
+@media (max-width:400px){
+  .features-grid{grid-template-columns:1fr;}
+}
+
+/* mobile nav overlay */
+.mobile-nav{
+  position:fixed;
+  inset:0;
+  background:rgba(9,9,11,.97);
+  backdrop-filter:blur(20px);
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:30px;
+  transform:translateY(-100%);
+  opacity:0;
+  transition:transform .5s var(--ease), opacity .5s var(--ease);
+  pointer-events:none;
+}
+.mobile-nav.open{transform:translateY(0);opacity:1;pointer-events:all;}
+.mobile-nav a{font-size:1.6rem;font-weight:600;font-family:'Space Grotesk';}
+.mobile-nav .close-btn{position:absolute;top:26px;right:26px;width:44px;height:44px;border-radius:50%;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+</style>
+</head>
+<body>
+
+<div class="ambient"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+
+<!-- HEADER -->
+<header class="header" id="header">
+  <div class="wrap header-inner">
+    <a href="#" class="logo"><span class="logo-mark"></span>Streamlay</a>
+    <nav class="nav">
+      <a href="#about">About</a>
+      <a href="#features">Features</a>
+      <a href="#download">Download</a>
+      <a href="#platforms">Platforms</a>
+    </nav>
+    <div class="header-cta">
+      <a href="#download" class="btn btn-ghost btn-sm">Learn More</a>
+      <a href="#download" class="btn btn-primary btn-sm">Download</a>
+      <button class="burger" id="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="close-btn" id="closeNav" aria-label="Close menu">✕</button>
+  <a href="#about">About</a>
+  <a href="#features">Features</a>
+  <a href="#download">Download</a>
+  <a href="#platforms">Platforms</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-badge"><span class="dot">S</span> Built for Android, from the ground up</div>
+      <h1>The Future of<br><span class="grad-text">Streaming.</span></h1>
+      <p class="lead">Discover thousands of movies and TV shows with a premium viewing experience designed for Android.</p>
+      <div class="hero-actions">
+        <a href="#download" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13m0 0l-5-5m5 5l5-5M5 21h14"/></svg>
+          Download APK
+        </a>
+        <a href="#about" class="btn btn-ghost">Learn More</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><b>25K+</b><span>Titles library</span></div>
+        <div class="hero-stat"><b>4.9★</b><span>Average rating</span></div>
+        <div class="hero-stat"><b>4K</b><span>Streaming ready</span></div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="orbit-field o1"><div class="ring"></div><div class="node"></div><div class="node n2"></div></div>
+      <div class="orbit-field o2"><div class="ring"></div><div class="node"></div></div>
+
+      <div class="glow-card gc1">
+        <div class="gc-row">
+          <div class="gc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3l14 9-14 9V3z"/></svg></div>
+          <div><div class="gc-title">Now Playing</div><div class="gc-sub">Resumed at 24:10</div></div>
+        </div>
+      </div>
+      <div class="glow-card gc2">
+        <div class="gc-row">
+          <div class="gc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-8-5-8-11a4 4 0 0 1 8-2 4 4 0 0 1 8 2c0 6-8 11-8 11z"/></svg></div>
+          <div><div class="gc-title">Saved to Library</div><div class="gc-sub">For later tonight</div></div>
+        </div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="phone-top"><span class="lm"></span><span>Streamlay</span></div>
+          <div class="phone-hero-card"></div>
+          <div class="phone-row-label">Continue Watching</div>
+          <div class="phone-grid">
+            <div></div><div></div><div></div><div></div><div></div><div></div>
+          </div>
+          <div class="phone-navbar"><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="wrap about-grid">
+    <div class="reveal">
+      <div class="eyebrow">About Streamlay</div>
+      <h2 class="section-title">A streaming experience built entirely for the way you actually watch.</h2>
+      <p class="section-lead">Streamlay is a next-generation streaming application built for Android users who want a fast, beautiful, and immersive entertainment experience. Discover trending movies, TV shows, personalized recommendations, and enjoy smooth playback with a modern interface designed for comfort and performance.</p>
+      <div class="about-list">
+        <div class="about-item"><span class="dot"></span><div><b>Premium experience</b>Crafted end-to-end for comfort</div></div>
+        <div class="about-item"><span class="dot"></span><div><b>Modern interface</b>Cinematic and effortless to browse</div></div>
+        <div class="about-item"><span class="dot"></span><div><b>Fast performance</b>Optimized for Android hardware</div></div>
+        <div class="about-item"><span class="dot"></span><div><b>High-quality playback</b>Sharp, stable, and smooth</div></div>
+        <div class="about-item"><span class="dot"></span><div><b>Personalized picks</b>Recommendations that adapt to you</div></div>
+        <div class="about-item"><span class="dot"></span><div><b>Secure & lightweight</b>Light footprint, strong protection</div></div>
+      </div>
+    </div>
+    <div class="about-visual reveal">
+      <div class="about-visual-inner">
+        <div class="mini-stat"><b>99.9%</b><span>Playback uptime across supported Android devices</span></div>
+        <div class="mini-stat"><b>&lt; 1.2s</b><span>Average time from tap to first frame</span></div>
+        <div class="mini-stat"><b>42 MB</b><span>Full install size, kept deliberately light</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="features-header reveal">
+      <div class="eyebrow" style="justify-content:center">Capabilities</div>
+      <h2 class="section-title">Powerful Features</h2>
+      <p class="section-lead">Every part of Streamlay is tuned for a smoother, more personal way to watch — from the interface down to the player itself.</p>
+    </div>
+    <div class="features-grid" id="featuresGrid"></div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="section" id="download">
+  <div class="wrap">
+    <div class="download-card reveal">
+      <div class="download-card-inner">
+        <div>
+          <div class="eyebrow">Get Streamlay</div>
+          <h2 class="section-title" style="margin-bottom:12px;">Download Streamlay</h2>
+          <p class="section-lead" style="margin-bottom:0;">Download Streamlay and enjoy a premium streaming experience on your Android device.</p>
+          <div class="download-meta">
+            <div class="meta-item"><span>Latest Version</span><b>2.4.1</b></div>
+            <div class="meta-item"><span>App Size</span><b>42 MB</b></div>
+            <div class="meta-item"><span>Requires</span><b>Android 8.0+</b></div>
+            <div class="meta-item"><span>Updated</span><b>Jul 2026</b></div>
+          </div>
+          <div class="download-actions">
+            <a href="#" class="btn btn-primary">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v13m0 0l-5-5m5 5l5-5M5 21h14"/></svg>
+              Download APK
+            </a>
+            <a href="#" class="btn btn-ghost">Google Play — Coming Soon</a>
+          </div>
+        </div>
+        <div class="download-visual">
+          <div class="dv-ring">
+            <div class="dv-core"><svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section class="section" id="platforms">
+  <div class="wrap">
+    <div class="features-header reveal">
+      <div class="eyebrow" style="justify-content:center">Everywhere You Watch</div>
+      <h2 class="section-title">Available Platforms</h2>
+      <p class="section-lead">Streamlay adapts its interface to the screen in front of you, without losing the details that make it feel premium.</p>
+    </div>
+    <div class="platform-grid" id="platformGrid"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo"><span class="logo-mark"></span>Streamlay</a>
+        <p>A next-generation streaming experience for Android, designed for comfort, speed, and cinematic detail.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#download">Download</a></li>
+          <li><a href="#platforms">Platforms</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:hello@streamlay.app">hello@streamlay.app</a></li>
+          <li><a href="#">Support Center</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Streamlay. All rights reserved.</span>
+      <span>Designed for Android.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ---------- Header scroll state ----------
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 30);
+});
+
+// ---------- Mobile nav ----------
+const burger = document.getElementById('burger');
+const mobileNav = document.getElementById('mobileNav');
+const closeNav = document.getElementById('closeNav');
+burger.addEventListener('click', () => mobileNav.classList.add('open'));
+closeNav.addEventListener('click', () => mobileNav.classList.remove('open'));
+mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileNav.classList.remove('open')));
+
+// ---------- Reveal on scroll ----------
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// ---------- Icon library (inline SVG paths) ----------
+const ICONS = {
+  layout: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+  bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  sparkle: '<path d="M12 3v4M12 17v4M4 12h4M16 12h4M6.5 6.5l2.5 2.5M15 15l2.5 2.5M17.5 6.5L15 9M9 15l-2.5 2.5"/>',
+  play: '<circle cx="12" cy="12" r="9"/><path d="M10 9l5 3-5 3V9z"/>',
+  heart: '<path d="M12 21s-8-5-8-11a4 4 0 0 1 8-2 4 4 0 0 1 8 2c0 6-8 11-8 11z"/>',
+  hd: '<rect x="3" y="6" width="18" height="12" rx="3"/><path d="M7 10v4M11 10v4M7 12h4M15 10v4h2a2 2 0 0 0 0-4h-2z"/>',
+  subtitle: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 15h4M13 15h4M7 11h10"/>',
+  audio: '<path d="M3 12h2l3-6 4 12 3-9 3 5h3"/>',
+  pip: '<rect x="3" y="4" width="18" height="14" rx="2"/><rect x="12" y="11" width="7" height="5" rx="1.5" fill="rgba(255,255,255,0.15)"/>',
+  download: '<path d="M12 3v11m0 0l-4-4m4 4l4-4M5 20h14"/>',
+  smooth: '<circle cx="12" cy="12" r="8"/><path d="M9 12l2 2 4-4"/>',
+  device: '<rect x="7" y="2" width="10" height="20" rx="3"/><path d="M11 18h2"/>',
+  resume: '<path d="M4 4v6h6M20 20v-6h-6"/><path d="M5.5 15A8 8 0 1 0 6 9"/>',
+  moon: '<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/>',
+  update: '<path d="M12 3a9 9 0 1 0 8.5 6"/><path d="M21 3v6h-6"/>'
+};
+function icon(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[name]}</svg>`; }
+
+// ---------- Feature data ----------
+const FEATURES = [
+  ['layout','Premium Modern Interface','A cinematic layout that keeps every title one glance away.'],
+  ['bolt','Lightning Fast Performance','Optimized rendering keeps every screen instant and fluid.'],
+  ['search','Smart Search','Find any title in seconds with predictive, typo-tolerant search.'],
+  ['sparkle','Personalized Recommendations','Suggestions that adapt to your taste with every watch.'],
+  ['play','Continue Watching','Pick up exactly where you left off, on any title.'],
+  ['heart','Favorite Library','Save titles to a personal library you can return to anytime.'],
+  ['hd','HD & 4K Streaming Ready','Crisp, detailed picture quality built for premium displays.'],
+  ['subtitle','Multiple Subtitle Support','Switch between subtitle tracks without breaking playback.'],
+  ['audio','Multiple Audio Tracks','Choose the language and mix that fits how you watch.'],
+  ['pip','Picture-in-Picture','Keep watching in a floating window while you multitask.'],
+  ['download','Download for Offline Viewing','Save titles locally and stream them without a connection.'],
+  ['smooth','Smooth Video Player','Buffer-free playback with fluid seeking and scrubbing.'],
+  ['device','Android Optimized','Tuned for Android phones, tablets, and TV out of the box.'],
+  ['resume','Automatic Playback Resume','Playback restarts precisely where you last paused.'],
+  ['moon','Dark Cinematic Theme','A theatre-dark palette designed for low-light viewing.'],
+  ['update','Regular Updates','Continuous improvements delivered straight to your device.']
+];
+const grid = document.getElementById('featuresGrid');
+FEATURES.forEach(([ic,title,desc],i) => {
+  const card = document.createElement('div');
+  card.className = 'feature-card reveal';
+  card.style.transitionDelay = `${(i%4)*0.06}s`;
+  card.innerHTML = `<div class="feature-icon">${icon(ic)}</div><h3>${title}</h3><p>${desc}</p>`;
+  grid.appendChild(card);
+  io.observe(card);
+});
+
+// ---------- Platform data ----------
+const PLATFORMS = [
+  ['device','Android Phones','A pocket-sized cinema with one-hand navigation and instant playback.'],
+  ['layout','Android Tablets','A wider canvas for browsing, with the same premium detail throughout.'],
+  ['hd','Android TV','A living-room-ready interface built for the big screen and a remote.']
+];
+const pGrid = document.getElementById('platformGrid');
+PLATFORMS.forEach(([ic,title,desc],i) => {
+  const card = document.createElement('div');
+  card.className = 'platform-card reveal';
+  card.style.transitionDelay = `${i*0.1}s`;
+  card.innerHTML = `<div class="platform-illustration">${icon(ic)}</div><h3>${title}</h3><p>${desc}</p>`;
+  pGrid.appendChild(card);
+  io.observe(card);
+});
+</script>
+</body>
+</html>
